@@ -34,7 +34,7 @@ def get_coords_as_array():
         if key in real_world.__dict__.keys() and real_world.__dict__[key] is not None and jetson1.__dict__[
             key] is not None:
             j1_arr = np.append(j1_arr, jetson1.__dict__[key],
-                               axis=0)  # TODO: make a python learning script where I add tuples to a numpy array... make sure I can add them as distinct points
+                               axis=0)
             world_points1 = np.append(world_points1, real_world.__dict__[key])
 
     j1_arr = j1_arr.reshape(-1, 2)
@@ -63,7 +63,7 @@ def get_all_coords_as_arrays():
         if key in real_world.__dict__.keys() and real_world.__dict__[key] is not None and jetson1.__dict__[
             key] is not None:
             j1_arr = np.append(j1_arr, jetson1.__dict__[key],
-                               axis=0)  # TODO: make a python learning script where I add tuples to a numpy array... make sure I can add them as distinct points
+                               axis=0)
             world_points1 = np.append(world_points1, real_world.__dict__[key])
 
     j1_arr = j1_arr.reshape(-1, 2)
