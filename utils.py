@@ -1,11 +1,10 @@
 import os
 import numpy as np
 
-from homgraphy_logic import CameraJetson3, CameraJetson1, RealWorldPitchCoords
+from config import CameraJetson3, CameraJetson1, RealWorldPitchCoords
 
-
-def save_homography_matrix(
-        homography_matrix: np.ndarray,
+def save_np_matrix(
+        matrix: np.ndarray,
         filename: str,
         directory: str = "data/homography_matrices/"
 ) -> None:
@@ -18,7 +17,7 @@ def save_homography_matrix(
     """
     if not os.path.exists(directory):
         os.makedirs(directory)
-    np.save(directory + filename, homography_matrix)
+    np.save(directory + filename, matrix)
 
 
 def get_coords_as_array():
