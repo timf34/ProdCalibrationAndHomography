@@ -8,10 +8,17 @@ from config import CameraJetson3, CameraJetson1, RealWorldPitchCoords, HOMOGRAPH
 from utils import save_np_matrix
 
 
+class HomographyLogic:
+    def __init__(self):
+        pass
+
+
 def compute_homographies(file_name: str = "new_h_jetson") -> Dict[str, np.ndarray]:
     jetson1 = CameraJetson1()
     jetson3 = CameraJetson3()
     real_world = RealWorldPitchCoords()
+    real_world.convert_to_pixel_coords()
+    print(real_world.__dict__)
 
     # Create an empty np array to store the pixel coordinates
     j1_arr = np.array([])
@@ -50,8 +57,8 @@ def compute_homographies(file_name: str = "new_h_jetson") -> Dict[str, np.ndarra
     save_np_matrix(matrix=h2, filename=f"{file_name}3")
 
     # Load the homography
-    h1 = np.load(os.path.join(HOMOGRAPHY_SAVE_DIR, "homography_matrix_jetson1.npy"))
-    h2 = np.load(os.path.join(HOMOGRAPHY_SAVE_DIR, "homography_matrix_jetson3.npy"))
+    # h1 = np.load(os.path.join(HOMOGRAPHY_SAVE_DIR, "homography_matrix_jetson1.npy"))
+    # h2 = np.load(os.path.join(HOMOGRAPHY_SAVE_DIR, "homography_matrix_jetson3.npy"))
 
     # Test the homography
     # Fix here: https://answers.opencv.org/question/252/cv2perspectivetransform-with-python/
