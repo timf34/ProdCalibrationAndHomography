@@ -14,4 +14,4 @@ def test_homography():
     test_point1 = np.array([[1408], [310], [1.0]], dtype='float32')
     for key in h.homographies.keys():
         transformed_point = h.perform_homography(homography=h.homographies[key], point=test_point1)
-        assert tranformed_point.shape == (3, 1), "The transformed point is not 3x1"
+        assert transformed_point.shape == (3, 1), "The transformed point is not 3x1"
