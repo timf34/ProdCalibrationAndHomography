@@ -69,24 +69,6 @@ class HomographyLogic:
         return transformed_point / transformed_point[2]
 
 
-# Old function.
-def inspect_shape_homography(homo: np.ndarray) -> None:
-    # # Transform the point
-    test_point = np.array([[1408], [310], [1.0]], dtype='float32')
-
-    transformed_point = homo @ test_point  # This isn't super accurate but we'll use it just to move on for now.
-    transformed_point = transformed_point / transformed_point[2]
-    print("1: ", transformed_point)
-
-    # Test with h1
-    test_point = np.array([[1062], [817], [1.0]], dtype='float32')
-    transformed_point = homo @ test_point  # This isn't super accurate but we'll use it just to move on for now.
-    transformed_point = transformed_point / transformed_point[2]
-    print("2: ", transformed_point)
-
-    assert transformed_point.shape == (3, 1), "The transformed point is not 3x1"
-
-
 def homography_idx(camera_id):
     # This returns the homography matrix, given a camera number (where the number is a string!)
     h_logic = HomographyLogic()
