@@ -46,12 +46,8 @@ class HomographyLogic:
     def find_homography(self, camera_coords: np.ndarray, real_world_coords: np.ndarray) -> np.ndarray:
         """
         Computes the homography matrix for a given camera and real world coords
-        :param jetson_camera:
-        :param real_world_coords:
-        :return: h: the homography matrix
         """
         h, status = cv2.findHomography(camera_coords, real_world_coords)
-
         return h
 
     def get_homographies(self) -> Dict[str, np.ndarray]:
@@ -109,6 +105,7 @@ def main():
     # New class
     h_logic = HomographyLogic()
     new_h = h_logic.get_homographies()
+    print(type(new_h["1"]))
 
 
 if __name__ == '__main__':
