@@ -61,6 +61,7 @@ class HomographyLogic:
 
     @staticmethod
     def perform_homography(homography: np.ndarray, point: np.ndarray) -> np.ndarray:
+        assert len(point) == 3, "Point should be of length 3"  # Point should be of the form [x, y, 1], not [x, y]
         transformed_point = homography @ point
         return transformed_point / transformed_point[2]
 
