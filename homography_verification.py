@@ -19,9 +19,11 @@ class VisualizeHomography:
         self.j3_image = cv2.imread("data/images/jetson3.jpg")
         self.birds_eye_image = cv2.imread("data/images/fieldmodel.jpg")
 
-    def visualize_homography(self, show_image: bool = False, save_image: bool = False) -> None :
+    def visualize_homography(self, show_image: bool = False, save_image: bool = False) -> None:
         """
         This function will visualize the homography self.h1 onto self.birds_eye_view image
+        :param show_image: Whether to show the image or not
+        :param save_image: Whether to save the image or not
         """
         img_out = cv2.warpPerspective(self.j3_image, self.h3, (self.birds_eye_image.shape[1], self.birds_eye_image.shape[0]))
 
@@ -47,16 +49,12 @@ class VisualizeHomography:
 
         return transformed_points.reshape(-1, 3)[:, :-1]  # Reshape to (n, 3) and remove the last column (all 1's)
 
-    def print_stats(self, homography_dataframe: pd.DataFrame) -> None:
+    @staticmethod
+    def print_stats(homography_dataframe: pd.DataFrame) -> None:
         """
         This function will print the stats of the homography dataframe -> Difference, mean, std dev
         :param homography_dataframe: Columns are "key", "transformed_point", "difference", "real_world", "camera_coords"
         """
-        # print("Difference between original and transformed points: ", homography_dataframe["difference"].values)
-        # print("Mean difference between original and transformed points: ", np.mean(homography_dataframe["difference"].values, axis=0))
-        # print("Standard deviation of the difference between original and transformed points: ", np.std(homography_dataframe["difference"].values, axis=0))
-
-        # We first need to convert the diff column to a np array
         diff = np.array([np.array(x) for x in homography_dataframe["difference"].values])
         print("Mean difference between original and transformed points: ", np.mean(diff, axis=0))
         print("Standard deviation of the difference between original and transformed points: ", np.std(diff, axis=0))
@@ -64,7 +62,12 @@ class VisualizeHomography:
     def get_labelled_dict(self, iter_diff: Iterator, transformed_points_iterator: Iterator, real_world_points: Iterator,
                           camera_points: Iterator) -> pd.DataFrame:
         """
-        This function will create a dictionary of the points and their labels.
+        This function will create a dictionary of the points and their labels. All inputs are iterators for ease of use.
+        :param iter_diff: The difference between the original and transformed points
+        :param transformed_points_iterator: The transformed points
+        :param real_world_points: The real world points
+        :param camera_points: The camera points
+        :return: A pandas dataframe with the labels
         """
         # Create pandas dataframe
         keys = [key for key in self.hl.jetson3.__dict__ if self.hl.jetson3.__dict__[key] is not None]
