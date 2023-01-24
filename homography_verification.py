@@ -1,6 +1,8 @@
 import cv2
+import json
+import pandas as pd
 import numpy as np
-from typing import Dict, List
+from typing import Dict, List, Iterator
 
 from config import CameraJetson3, CameraJetson1, RealWorldPitchCoords
 from homgraphy_logic import HomographyLogic
@@ -54,6 +56,9 @@ class VisualizeHomography:
         transformed_points = transformed_points[:, :-1]
         # Convert numbers to not show in scientific notation
 
+        # Copy numpy array to iterator to avoid changing original array
+        transformed_points_iterator = iter(transformed_points.copy())
+
 
         # Compare the original points to the transformed points
         print("Original points: ", c3)
@@ -62,6 +67,8 @@ class VisualizeHomography:
 
         # # Calculate the difference between the original and transformed points
         diff = r3 - transformed_points
+        # Round all points to 1 decimal place
+        diff = np.round(diff, 1)
         print("Difference between original and transformed points: ", diff)
 
         # Calculate the mean difference between the original and transformed points
@@ -72,10 +79,31 @@ class VisualizeHomography:
         std_diff = np.std(diff, axis=0)
         print("Standard deviation of the difference between original and transformed points: ", std_diff)
 
+        # Creating another dictionary to print here so we can clearly identify points.
+        iter_diff = iter(diff)
+        labelling_points = self.get_labelled_dict(iter_diff, transformed_points_iterator, real_world_points=iter(r3), camera_points=iter(c3))
+
+        # Print everything in the pd dataframe labelling_points
+        pd.options.display.max_columns = None
+        print(labelling_points)
+
+    def get_labelled_dict(self, iter_diff: Iterator, transformed_points_iterator: Iterator, real_world_points: Iterator, camera_points: Iterator) -> pd.DataFrame:
+        """
+        This function will create a dictionary of the points and their labels.
+        """
+        # Create pandas dataframe
+        keys = [key for key in self.hl.jetson3.__dict__ if self.hl.jetson3.__dict__[key] is not None]
+        df = pd.DataFrame(columns=["key", "transformed_point", "difference", "real_world", "camera"])
+        for count, (key, j, _diff, real, cam_p) in enumerate(zip(keys, transformed_points_iterator, iter_diff, real_world_points, camera_points)):
+            if key is not None:
+                df.loc[count] = [key, j.tolist(), _diff.tolist(), real, cam_p]
+
+        return df
+
 
 def main():
     visualize_homography = VisualizeHomography()
-    # visualize_homography.visualize_homography()
+    # visualize_homography.visualize_homography(show_image=True, save_image=True)
     visualize_homography.check_transformed_points()
 
 
