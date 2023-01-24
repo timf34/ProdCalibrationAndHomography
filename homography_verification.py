@@ -32,6 +32,21 @@ class VisualizeHomography:
         if save_image:
             cv2.imwrite("data/images/jetson3_homography.jpg", img_out)
 
+    def get_transformed_points(self, camera_points: np.ndarray) -> np.ndarray:
+        """
+        Transforms the camera points to the real world points.
+        """
+        camera_points_3d = np.c_[camera_points, np.ones(len(camera_points))]
+        transformed_points = np.array([])
+
+        for point in camera_points_3d:
+            point = self.hl.perform_homography(homography=self.h3, point=point)
+            point = [round(x, 1) for x in point]  # Convert to list and round to 1 decimal place
+            transformed_points = np.append(transformed_points, point)
+
+        return transformed_points.reshape(-1, 3)[:, :-1]  # Reshape to (n, 3) and remove the last column (all 1's)
+
+
     def check_transformed_points(self) -> None:
         """
         Perform a homography on our original points and compare them to the transformed points.
@@ -40,21 +55,9 @@ class VisualizeHomography:
         # Get the original points
         c3, r3 = self.hl.get_real_world_coords(jetson_camera=self.hl.jetson3)
 
-        # Get the transformed points
-        transformed_points = np.array([])
-        for point in c3:
-            # Extend point from [x, y] to [x, y, 1]
-            point = np.append(point, 1)
-            point = self.hl.perform_homography(homography=self.h3, point=point)
-            # convert from np.array to list and round to 1 decimal place
-            point = [round(x, 1) for x in point]
-            # Add to transformed_points (we will reshape later)
-            transformed_points = np.append(transformed_points, point)
-
-        transformed_points = transformed_points.reshape(-1, 3)  # Reshape to (n, 3)
-        # Remove the last column (all 1's)
-        transformed_points = transformed_points[:, :-1]
-        # Convert numbers to not show in scientific notation
+        print("yo2, £, ", type(c3))
+        print("c3 shape: ", c3.shape)
+        transformed_points = self.get_transformed_points(camera_points=c3)
 
         # Copy numpy array to iterator to avoid changing original array
         transformed_points_iterator = iter(transformed_points.copy())
@@ -87,14 +90,16 @@ class VisualizeHomography:
         pd.options.display.max_columns = None
         print(labelling_points)
 
-    def get_labelled_dict(self, iter_diff: Iterator, transformed_points_iterator: Iterator, real_world_points: Iterator, camera_points: Iterator) -> pd.DataFrame:
+    def get_labelled_dict(self, iter_diff: Iterator, transformed_points_iterator: Iterator, real_world_points: Iterator,
+                          camera_points: Iterator) -> pd.DataFrame:
         """
         This function will create a dictionary of the points and their labels.
         """
         # Create pandas dataframe
         keys = [key for key in self.hl.jetson3.__dict__ if self.hl.jetson3.__dict__[key] is not None]
         df = pd.DataFrame(columns=["key", "transformed_point", "difference", "real_world", "camera"])
-        for count, (key, j, _diff, real, cam_p) in enumerate(zip(keys, transformed_points_iterator, iter_diff, real_world_points, camera_points)):
+        for count, (key, j, _diff, real, cam_p) in enumerate(zip(keys, transformed_points_iterator, iter_diff,
+                                                                 real_world_points, camera_points)):
             if key is not None:
                 df.loc[count] = [key, j.tolist(), _diff.tolist(), real, cam_p]
 
